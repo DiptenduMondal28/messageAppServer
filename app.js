@@ -15,17 +15,19 @@ const sequalize=require('./util/database')
 const app = express();
 app.use(bodyParser.json());
 app.use(cors({
-    origin:'*', //origin not found in my pc
+    origin:'http://127.0.0.1:5500', //origin not found in my pc
     methods:['GET','POST','DELETE','PUT'],
     credentials:true
 }));
 app.use(express.json());
 
 //file import
-const signupRouter=require('./route/signup');
+const signupRouter=require('./route/signupRouter');
+const loginRouter=require('./route/loginRoute');
 
 
 app.use("/signup",signupRouter);
+app.use(loginRouter);
 
 
 sequalize.sync().then(()=>{
