@@ -15,20 +15,28 @@ const sequalize=require('./util/database')
 const app = express();
 app.use(bodyParser.json());
 app.use(cors({
-    origin:'http://127.0.0.1:5500', //origin not found in my pc
+    origin:'*', //origin not found in my pc
     methods:['GET','POST','DELETE','PUT'],
     credentials:true
 }));
 app.use(express.json());
 
-//file import
+//router import
 const signupRouter=require('./route/signupRouter');
 const loginRouter=require('./route/loginRoute');
+const messageRouter=require('./route/messageRouter');
+
+//module import
+const User=require('./module/signup');
+const Message=require('./module/message');
 
 
 app.use("/signup",signupRouter);
 app.use(loginRouter);
+app.use('/user',messageRouter);
 
+User.hasMany(Message);
+Message.belongsTo(User);
 
 sequalize.sync().then(()=>{
     console.log('sync');
