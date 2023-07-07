@@ -14,11 +14,15 @@ const sequalize=require('./util/database')
 //module imort function
 const app = express();
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors({
+    origin:'*', //origin not found in my pc
+    methods:['GET','POST','DELETE','PUT'],
+    credentials:true
+}));
 app.use(express.json());
 
 //file import
-const signupRouter=require('./route/signup')
+const signupRouter=require('./route/signup');
 
 
 app.use("/signup",signupRouter);
