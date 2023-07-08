@@ -1,6 +1,7 @@
-const { response } = require('express');
 const Message=require('../module/message');
 const message = require('../module/message');
+const { where } = require('sequelize');
+const User=require('../module/signup')
 
 module.exports.messageSent=async(req,res,next)=>{
     // console.log(req);
@@ -11,8 +12,8 @@ module.exports.messageSent=async(req,res,next)=>{
 };
 
 module.exports.getreply=async(req,res,next)=>{
-    await Message.findAll().then(message=>{
-        // console.log(message);
-        res.json({message:message});
+    //console.log(req.params)
+    await Message.findAll({include:[User]}).then((messages)=>{
+        res.json({message:messages})
     })
 }

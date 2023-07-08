@@ -5,9 +5,9 @@ require('dotenv').config();
 const authenticate=async (req,res,next)=>{
     try{
         const token=req.header('Authorization');
-        console.log(token);
+        //console.log(token);
         const user=jwt.verify(token,process.env.JWT_TOKEN);
-        console.log("auth:"+user.userId);
+        //console.log("auth:"+user.userId);
         if(!user.userId){
             throw new Error('Invalid user id');
         }
