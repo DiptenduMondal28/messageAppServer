@@ -6,4 +6,7 @@ const controller = require('../controller/messageController');
 //user message sent
 router.post('/message',authentication.authenticate,controller.messageSent);
 
+//get reply from other
+router.get('/reply',authentication.authenticate,controller.getreply);
+
 module.exports=router;
