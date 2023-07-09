@@ -12,8 +12,24 @@ module.exports.messageSent=async(req,res,next)=>{
 };
 
 module.exports.getreply=async(req,res,next)=>{
-    //console.log(req.params)
-    await Message.findAll({include:[User]}).then((messages)=>{
-        res.json({message:messages})
-    })
+    try{
+        console.log(req.query.start);
+        let start = req.query.start;
+        let offSet = 0;
+        if(!start){
+            offSet = 1;
+        }else{
+            offSet = Number(start);
+        }
+        console.log('offset',offSet)
+        await Message.findAll({
+            offset:offSet,
+            include:[User]
+        }).then((messages)=>{
+            res.json({message:messages})
+        })
+    }catch(err){
+        console.log(err);
+    }
+    
 }
