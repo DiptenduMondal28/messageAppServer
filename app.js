@@ -39,11 +39,11 @@ app.use('/user',messageRouter);
 app.use("/group",groupRouter)
 
 User.hasMany(Message);
-Message.belongsTo(User);
+Message.belongsTo(User,{constraints: true, onDelete: 'CASCADE'});
 User.belongsToMany(Group,{through:userGroup});
 Group.belongsToMany(User,{through:userGroup});
 Group.hasMany(Message);
-Message.belongsTo(Group);
+Message.belongsTo(Group,{constraints: true, onDelete: 'CASCADE'});
 
 
 sequalize.sync().then(()=>{
