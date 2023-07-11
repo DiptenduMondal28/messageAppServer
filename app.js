@@ -25,18 +25,26 @@ app.use(express.json());
 const signupRouter=require('./route/signupRouter');
 const loginRouter=require('./route/loginRoute');
 const messageRouter=require('./route/messageRouter');
+const groupRouter=require('./route/groupRouter');
 
 //module import
 const User=require('./module/signup');
 const Message=require('./module/message');
-
+const Group = require('./module/group')
+const userGroup = require('./module/userGroup');
 
 app.use("/signup",signupRouter);
 app.use(loginRouter);
 app.use('/user',messageRouter);
+app.use("/group",groupRouter)
 
 User.hasMany(Message);
 Message.belongsTo(User);
+User.belongsToMany(Group,{through:userGroup});
+Group.belongsToMany(User,{through:userGroup});
+Group.hasMany(Message);
+Message.belongsTo(Group);
+
 
 sequalize.sync().then(()=>{
     console.log('sync');

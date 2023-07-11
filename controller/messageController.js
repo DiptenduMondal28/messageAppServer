@@ -1,19 +1,23 @@
 const Message=require('../module/message');
-const message = require('../module/message');
 const { where } = require('sequelize');
 const User=require('../module/signup')
-
+const Group=require('../module/group')
 module.exports.messageSent=async(req,res,next)=>{
-    // console.log(req);
+    console.log('user message sent',req.body);
+    console.log(req.user.id)
     await Message.create({
         message:req.body.message,
-        userId:req.user.id
+        userId:req.user.id,
+        groupId:req.body.groupid
+    }).then(result=>{
+        console.log(result);
     })
 };
 
 module.exports.getreply=async(req,res,next)=>{
     try{
-        console.log(req.query.start);
+        // console.log(req.query.start);
+        // console.log(req);
         let start = req.query.start;
         let offSet = 0;
         if(!start){
@@ -21,10 +25,13 @@ module.exports.getreply=async(req,res,next)=>{
         }else{
             offSet = Number(start);
         }
-        console.log('offset',offSet)
+        // console.log('offset',offSet)
+        console.log('group name:',req.query.group);
+        console.log(typeof(req.query.Group))
         await Message.findAll({
-            offset:offSet,
-            include:[User]
+            where:{groupId:Number(req.query.group)},
+            // offset:offSet,
+            include:[User,Group]
         }).then((messages)=>{
             res.json({message:messages})
         })
