@@ -16,27 +16,57 @@ module.exports.messageSent=async(req,res,next)=>{
 
 module.exports.getreply=async(req,res,next)=>{
     try{
-        // console.log(req.query.start);
-        // console.log(req);
-        let start = req.query.start;
-        let offSet = 0;
-        if(!start){
-            offSet = 1;
-        }else{
-            offSet = Number(start);
-        }
-        // console.log('offset',offSet)
-        console.log('group name:',req.query.group);
+        console.log('group id',req.query.group);
         console.log(typeof(req.query.Group))
+        console.log('another req  query:',req.query)
+        const totalMessage=await Message.count();
         await Message.findAll({
             where:{groupId:Number(req.query.group)},
-            // offset:offSet,
-            include:[User,Group]
+            include:[User,Group],
         }).then((messages)=>{
+            // console.log(messages);
             res.json({message:messages})
         })
     }catch(err){
         console.log(err);
     }
     
+};
+
+module.exports.lastMessage=async(req,res,next)=>{
+    console.log('what is request',req.query);
+    try{
+        const groupId = parseInt(req.query.group);
+        const lastMessageid=parseInt(req.query.lastmessageid)
+        console.log(groupId,lastMessageid);
+        const totalMessage=await Message.count();
+        if(totalMessage>lastMessageid){
+            const lastMessage = await Message.findAll({
+                where: {
+                    groupId: groupId
+                },
+                include:[User,Group],
+                offset:lastMessageid
+            }).then(result=>{
+                console.log(result)
+                res.status(200).json(result);
+            })
+        }
+        // const lastMessage = await Message.findAll({
+        //     where: {
+        //         groupId: groupId
+        //     },
+        //     include:[User,Group],
+        //     offset:lastMessageid,
+        //     limit:1
+        // }).then(result=>{
+        //     console.log(result)
+        //     res.status(200).json(result);
+        // })
+    }
+    catch(err){
+        console.log(err);
+    }
+
+
 }

@@ -14,12 +14,15 @@ const sequalize=require('./util/database')
 //module imort function
 const app = express();
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors({
     origin:'*', //origin not found in my pc
     methods:['GET','POST','DELETE','PUT'],
     credentials:true
 }));
 app.use(express.json());
+
+
 
 //router import
 const signupRouter=require('./route/signupRouter');
@@ -50,3 +53,4 @@ sequalize.sync().then(()=>{
     console.log('sync');
     app.listen(3000);
 }).catch((err)=>console.log(err));
+

@@ -7,6 +7,9 @@ const controller = require('../controller/messageController');
 router.post('/message',authentication.authenticate,controller.messageSent);
 
 //get reply from other
-router.get('/reply',authentication.authenticate,controller.getreply);
+router.get('/allreply',authentication.authenticate,controller.getreply);
+
+//get last message
+router.get('/lastmessage',authentication.authenticate,controller.lastMessage);
 
 module.exports=router;
