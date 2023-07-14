@@ -37,32 +37,18 @@ module.exports.lastMessage=async(req,res,next)=>{
     console.log('what is request',req.query);
     try{
         const groupId = parseInt(req.query.group);
-        const lastMessageid=parseInt(req.query.lastmessageid)
-        console.log(groupId,lastMessageid);
-        const totalMessage=await Message.count();
-        if(totalMessage>lastMessageid){
-            const lastMessage = await Message.findAll({
-                where: {
-                    groupId: groupId
-                },
-                include:[User,Group],
-                offset:lastMessageid
-            }).then(result=>{
-                console.log(result)
-                res.status(200).json(result);
-            })
-        }
-        // const lastMessage = await Message.findAll({
-        //     where: {
-        //         groupId: groupId
-        //     },
-        //     include:[User,Group],
-        //     offset:lastMessageid,
-        //     limit:1
-        // }).then(result=>{
-        //     console.log(result)
-        //     res.status(200).json(result);
-        // })
+        const lastMessage = await Message.findOne({
+            where: {
+                groupId: groupId
+            },
+            order: [['createdAt', 'DESC']],
+            include:[User,Group]
+        }).then(result=>{
+            console.log(result)
+            res.status(200).json(result);
+        }).catch(err=>{
+            console.log(err);
+        })
     }
     catch(err){
         console.log(err);
