@@ -1,7 +1,11 @@
 const Message=require('../module/message');
 const { where } = require('sequelize');
 const User=require('../module/signup')
-const Group=require('../module/group')
+const Group=require('../module/group');
+const message = require('../module/message');
+const AWS=require('aws-sdk');
+require('dotenv').config();
+
 module.exports.messageSent=async(req,res,next)=>{
     console.log('user message sent',req.body);
     console.log(req.user.id)
@@ -56,3 +60,65 @@ module.exports.lastMessage=async(req,res,next)=>{
 
 
 }
+
+module.exports.fileHandle=async(req,res,next)=>{
+    console.log('file type',req.body.file);
+    const file=req.body.file;
+    console.log('file user name',req.user.id);
+    const userId=req.user.id;
+    console.log('group id:',req.body.groupid);
+    const groupId=req.body.groupid;
+    if(file && userId && groupId){
+        try{
+            const filename=`file${new Date().jpg}`
+            const fileUrl=await uploadToS3(file,filename);
+            console.log(fileUrl);
+            await Message.create({
+                message:fileUrl,
+                userId:userId,
+                groupId:groupId
+            }).then(result=>{
+                console.log(result);
+            }).catch(err=>{
+                console.log(err)
+            })
+
+            res.status(200).json({message:'successfully upload to server'})
+        }catch(err){
+            console.log(err)
+            res.status(400).json({message:'failed to upload'})
+        }
+    }else{
+        res.status(401).json({message:'unauthorized access'})
+    }
+}
+
+const uploadToS3 = (data,filename)=>{
+    const BUCKET_NAME=process.env.AWS_BUCKET_NAME;
+    const IAM_USER_KEY=process.env.AWS_ACCESS_KEY;
+    const IAM_USER_SECRET=process.env.AWS_SECRET_KEY;
+
+    let s3bucket=new AWS.S3({
+        accessKeyId:IAM_USER_KEY,
+        secretAccessKey:IAM_USER_SECRET,
+        //Bucket:BUCKET_NAME
+    })
+    var params={
+        Bucket:BUCKET_NAME,
+        Key:filename,
+        Body:data,
+        ACL:'public-read'
+    }
+
+    return new Promise((resolve,reject)=>{
+        s3bucket.upload(params,(err,response)=>{
+            if(err){
+                console.log("something wrong with upload data in s3 create bucket:",err)
+                reject(err)
+            }else{
+                console.log("success:",response);
+                resolve(response.Location);
+            }
+        })
+    })
+};
