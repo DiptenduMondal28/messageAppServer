@@ -1,7 +1,11 @@
 const Message=require('../module/message');
 const { where } = require('sequelize');
 const User=require('../module/signup')
-const Group=require('../module/group')
+const Group=require('../module/group');
+const message = require('../module/message');
+const AWS=require('aws-sdk');
+require('dotenv').config();
+
 module.exports.messageSent=async(req,res,next)=>{
     console.log('user message sent',req.body);
     console.log(req.user.id)
@@ -56,4 +60,3 @@ module.exports.lastMessage=async(req,res,next)=>{
 
 
 }
-
