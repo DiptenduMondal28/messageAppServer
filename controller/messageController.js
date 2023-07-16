@@ -62,16 +62,16 @@ module.exports.lastMessage=async(req,res,next)=>{
 }
 
 module.exports.fileHandle=async(req,res,next)=>{
-    console.log('file type',req.body.file);
-    const file=req.body.file;
+    console.log('file type',req.file);
+    const file=req.file;
     console.log('file user name',req.user.id);
     const userId=req.user.id;
-    console.log('group id:',req.body.groupid);
-    const groupId=req.body.groupid;
+     console.log('group id:',req.query.groupid);
+    const groupId=req.query.groupid;
     if(file && userId && groupId){
         try{
-            const filename=`file${new Date().jpg}`
-            const fileUrl=await uploadToS3(file,filename);
+            const filename=`file${new Date()}.jpg`;
+            const fileUrl=await uploadToS3(file.buffer,filename);
             console.log(fileUrl);
             await Message.create({
                 message:fileUrl,
@@ -91,34 +91,49 @@ module.exports.fileHandle=async(req,res,next)=>{
     }else{
         res.status(401).json({message:'unauthorized access'})
     }
+//     console.log(req.query.groupid)
+//     console.log(req.user.id)
+//     if (req.file) {
+//         // File was uploaded successfully
+//         console.log(req.file)
+//         console.log('file upload successfull');
+//         res.status(200).json({ message: 'File uploaded successfully' });
+//       } else {
+//         // No file was received
+//         console.log('file upload UN-successfull');
+//         res.status(400).json({ message: 'No file received' });
+//       }
 }
 
-const uploadToS3 = (data,filename)=>{
-    const BUCKET_NAME=process.env.AWS_BUCKET_NAME;
-    const IAM_USER_KEY=process.env.AWS_ACCESS_KEY;
-    const IAM_USER_SECRET=process.env.AWS_SECRET_KEY;
 
-    let s3bucket=new AWS.S3({
-        accessKeyId:IAM_USER_KEY,
-        secretAccessKey:IAM_USER_SECRET,
-        //Bucket:BUCKET_NAME
-    })
-    var params={
-        Bucket:BUCKET_NAME,
-        Key:filename,
-        Body:data,
-        ACL:'public-read'
-    }
 
-    return new Promise((resolve,reject)=>{
-        s3bucket.upload(params,(err,response)=>{
-            if(err){
-                console.log("something wrong with upload data in s3 create bucket:",err)
-                reject(err)
-            }else{
-                console.log("success:",response);
-                resolve(response.Location);
-            }
-        })
-    })
-};
+const uploadToS3 =async (data, filename) => {
+    const BUCKET_NAME = process.env.AWS_BUCKET_NAME;
+    const IAM_USER_KEY = process.env.AWS_ACCESS_KEY;
+    const IAM_USER_SECRET = process.env.AWS_SECRET_KEY;
+  
+    let s3bucket = new AWS.S3({
+      accessKeyId: IAM_USER_KEY,
+      secretAccessKey: IAM_USER_SECRET,
+    });
+    console.log(data,filename);
+    var params = {
+      Bucket: BUCKET_NAME,
+      Key: filename,
+      Body: data,
+      ACL: 'public-read',
+    };
+  
+    return new Promise((resolve, reject) => {
+      s3bucket.upload(params, (err, response) => {
+        if (err) {
+          console.log('Something went wrong with uploading data to S3:', err);
+          reject(err);
+        } else {
+          console.log('Successfully uploaded to S3:', response);
+          resolve(response.Location);
+        }
+      });
+    });
+  };
+
