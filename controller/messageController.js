@@ -60,3 +60,47 @@ module.exports.lastMessage=async(req,res,next)=>{
 
 
 }
+
+module.exports.fileHandle=async(req,res,next)=>{
+    console.log('file type',req.file);
+    const file=req.file;
+    console.log('file user name',req.user.id);
+    const userId=req.user.id;
+     console.log('group id:',req.query.groupid);
+    const groupId=req.query.groupid;
+    if(file && userId && groupId){
+        try{
+            const filename=`file${new Date()}.jpg`;
+            const fileUrl=await uploadToS3(file.buffer,filename);
+            console.log(fileUrl);
+            await Message.create({
+                message:fileUrl,
+                userId:userId,
+                groupId:groupId
+            }).then(result=>{
+                console.log(result);
+            }).catch(err=>{
+                console.log(err)
+            })
+
+            res.status(200).json({message:'successfully upload to server'})
+        }catch(err){
+            console.log(err)
+            res.status(400).json({message:'failed to upload'})
+        }
+    }else{
+        res.status(401).json({message:'unauthorized access'})
+    }
+//     console.log(req.query.groupid)
+//     console.log(req.user.id)
+//     if (req.file) {
+//         // File was uploaded successfully
+//         console.log(req.file)
+//         console.log('file upload successfull');
+//         res.status(200).json({ message: 'File uploaded successfully' });
+//       } else {
+//         // No file was received
+//         console.log('file upload UN-successfull');
+//         res.status(400).json({ message: 'No file received' });
+//       }
+}
