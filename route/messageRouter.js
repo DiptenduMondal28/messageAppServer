@@ -16,6 +16,6 @@ router.get('/allreply',authentication.authenticate,controller.getreply);
 router.get('/lastmessage',authentication.authenticate,controller.lastMessage);
 
 //file sending 
-//router.post('/file',authentication.authenticate,upload.single('file'),controller.fileHandle);
+router.post('/file',authentication.authenticate,upload.single('file'),controller.fileHandle);
 
 module.exports=router;
